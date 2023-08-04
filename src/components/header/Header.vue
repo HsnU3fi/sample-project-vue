@@ -1,5 +1,4 @@
 <template>
-
   <header class="header">
 
     <div class="row-items">
@@ -23,16 +22,15 @@
             Are you sure you want to exit ?
           </h2>
           <div class="row-center">
-            <button class="space-item" @click="showDialog = false"><h3 class="font-word">Cancel</h3></button>
+            <button  class="space-item btn"  @click="showDialog = false"><h3 class="font-word">Cancel</h3></button>
             <div class="space-item"/>
-            <button class="space-item" @click="logOut"><h3 class="font-word">Yes</h3></button>
+            <button class="space-item btn" @click="logOut"><h3 class="font-word">Yes</h3></button>
           </div>
         </div>
       </div>
     </div>
 
   </header>
-
 </template>
 
 <script>
@@ -53,14 +51,17 @@ export default {
         this.username = userData.username
       }
     },
+    //==================================================================================================================
     toggleDropdown() {
       this.isOpen = !this.isOpen;
     },
+    //==================================================================================================================
     logOut() {
       localStorage.removeItem("userData");
       this.showDialog = false
       window.location.reload();
     }
+    //==================================================================================================================
   },
   created() {
     this.getUsername()
@@ -107,7 +108,8 @@ export default {
   position: absolute;
   left: 0;
   border-radius: 8px;
-  margin-top: -10px;
+  margin-left: 10px;
+  margin-top: -8px;
   background-color: #f6feff;
   padding: 8px;
   height: 65px;
@@ -132,8 +134,9 @@ export default {
 
 
 .img {
+
   margin-top: -13px;
-  margin-left: -25px;
+  margin-left: -10px;
 }
 
 .icon {

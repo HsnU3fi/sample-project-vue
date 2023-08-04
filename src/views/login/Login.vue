@@ -32,8 +32,8 @@ export default {
     };
   },
   methods: {
+    //==================================================================================================================
     login() {
-      //check role user
       let objUserData = {
         "username": this.username[0].toUpperCase() + this.username.slice(1),
         "password": this.password,
@@ -132,10 +132,10 @@ form input {
 form button {
   width: 100%;
   padding: 10px;
-  background-color: #FFC23D;
   margin-top: 50px;
   color: white;
   border: none;
+  background-color:#F9B319 ;
   border-radius: 4px;
   cursor: pointer;
 }

@@ -1,20 +1,23 @@
-import { createApp } from 'vue'
+import {createApp} from 'vue'
+import '../src/assets/main.css'
 import App from './App.vue'
 import router from './router'
-import vuetify from './plugins/vuetify'
-import '../src/assets/main.css'
+// import vuetify from './plugins/vuetify'
+// import Vue3EasyDataTable from 'vue3-easy-data-table';
+// import 'vue3-easy-data-table/dist/style.css';
+
+// import VueGoodTablePlugin from 'vue-good-table';
+
+// import the styles
+// import 'vue-good-table/dist/vue-good-table.css'
 
 
-createApp(App)
-  .use(router)
-  .use(vuetify)
-  .mount('#app')
+const app = createApp(App)
 
-// let userData = JSON.parse(localStorage.getItem('userData'))
-// if(userData){
-//     router.push("/");
-//
-// }else {
-//     router.push("/");
-//
-// }
+// app.use(Vue3EasyDataTable)
+
+app
+    .use(router)
+    // .use(VueGoodTablePlugin)
+    // .use(vuetify)
+    .mount('#app')

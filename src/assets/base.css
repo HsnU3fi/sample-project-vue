@@ -61,7 +61,10 @@
 body {
   min-height: 100vh;
   color: var(--color-text);
-  background: var(--color-background);
+  background: rgb(210,255,245);
+  background: linear-gradient(189deg, rgba(210,255,245,1) 25%, rgba(240,253,255,1) 50%, rgba(250,228,255,1) 75%);
+
+  /*background: var(--color-background);*/
   transition: color 0.5s, background-color 0.5s;
   line-height: 1.6;
   font-family: Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu,
