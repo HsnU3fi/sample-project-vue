@@ -3,28 +3,31 @@
   <Alert :show="show" :color="color" :text="text"/>
 
   <div class="table-container">
-    <label>
-      <input type="text" class="search-bar" v-model="searchText" @input="resetPage" placeholder="Search...">
+    <h2 v-if="!items" class="row-center font-word space-top">
+      Please add a new item
+    </h2>
+
+    <label v-if="items">
+      <input type="text" class="search-bar" v-model="searchQuery" placeholder="Search By Id">
     </label>
 
 
-    <button @click="showDialogAddItem=true" class="right btn-item cursor">
+    <button @click="showDialogAddItem=true" class="right btn-add-item cursor">
       <h3>Add Item</h3>
     </button>
-    <table class="table">
+
+    <table v-if="items" class="table">
       <thead>
       <tr>
-        <th>id</th>
-        <th>todo</th>
-        <th>created at</th>
-        <th>is complete</th>
-        <th>edit item</th>
-        <th>delete item</th>
+        <th>ID</th>
+        <th>TODO</th>
+        <th>CREATED AT</th>
+        <th>IS COMPLETE</th>
+        <th>DELETE ITEM</th>
       </tr>
       </thead>
       <tbody>
-      <tr v-for="(item,i) in  items" :key="i">
-
+      <tr v-for="(item,i) in  paginatedItems" :key="i">
         <td>{{ item._id }}</td>
         <td>
           <div class="tooltip">{{ item.todoName.slice(0, 30) + ' ...' }}
@@ -34,16 +37,11 @@
         <td>{{ formatDate(item.createdAt) }}</td>
 
         <td>
-          <button :style="getColor(item.isComplet)">
-            <h3 class="row-center">{{ changeTitle(item.isComplet) }}</h3>
+          <button @click="editItem(item)" class="cursor" :style="getColor(item.isComplete)">
+            <h3 class="row-center">{{ changeTitle(item.isComplete) }}</h3>
           </button>
         </td>
 
-        <td>
-          <button @click="getDataEdit(item)" class="btn-edit cursor">
-            <h3>Edit</h3>
-          </button>
-        </td>
 
         <td>
           <button @click="showDialogDeleteItem=true" class="btn-delete cursor">
@@ -51,14 +49,14 @@
           </button>
         </td>
 
-        <div v-if="showDialogDeleteItem" class="dialog-overlay">
+        <div  v-if="showDialogDeleteItem" class="dialog-overlay">
           <div class="dialog-item">
 
             <h2 class="font-word">
               Are you sure you want to delete item ?
             </h2>
             <div class="row-center">
-              <button class="space-item btn-dialog" @click="showDialogDeleteItem = false"><h3 class="font-word">
+              <button class="space-item btn-dialog" @click="showDialogDeleteItem = false;"><h3 class="font-word">
                 Cancel</h3>
               </button>
               <div class="space-item"/>
@@ -67,40 +65,16 @@
             </div>
           </div>
         </div>
-
-
-
-        <div v-if="showDialogEditItem" class="dialog-overlay">
-          <div class="dialog-item">
-            <h3>Todo:</h3>
-            <textarea class="textarea-size" v-model="todoNameEdit"/>
-            <h3>
-              {{toggleTitle()}}
-            </h3>
-            <div>
-              <button class="toggle-button" :class="{ active: isToggledEdit }" @click="toggle">
-                <div class="toggle-circle" :class="{ active: isToggledEdit }"/>
-              </button>
-            </div>
-            <div class="row-center">
-              <button class="space-item btn-dialog" @click="showDialogEditItem = false"><h3 class="font-word">Cancel</h3>
-              </button>
-              <div class="space-item"/>
-              <button class="space-item btn-dialog" @click="editItem()"><h3 class="font-word">Save</h3></button>
-            </div>
-          </div>
-        </div>
-
       </tr>
       </tbody>
     </table>
 
-    <div v-if="showDialogAddItem" class="dialog-overlay">
+    <div  v-if="showDialogAddItem" class="dialog-overlay">
       <div class="dialog-item">
-        <h3>Todo:</h3>
-        <textarea class="textarea-size" v-model="todoName"/>
-        <h3>
-          {{toggleTitle()}}
+        <h3 class="font-word">Todo:</h3>
+        <textarea  required class="textarea-size" v-model="todoName"/>
+        <h3 class="font-word">
+          {{ toggleTitle() }}
         </h3>
         <div>
           <button class="toggle-button" :class="{ active: isToggled }" @click="toggle">
@@ -108,170 +82,83 @@
           </button>
         </div>
         <div class="row-center">
-          <button class="space-item btn-dialog" @click="showDialogAddItem = false"><h3 class="font-word">Cancel</h3>
+          <button class="space-item btn-dialog" @click="showDialogAddItem = false;"><h3 class="font-word">Cancel</h3>
           </button>
           <div class="space-item"/>
-          <button class="space-item btn-dialog" @click="addItem()"><h3 class="font-word">Save</h3></button>
+          <button @click="addItem();" class="space-item btn-dialog"><h3 class="font-word">Save</h3></button>
         </div>
       </div>
     </div>
 
-    <nav class="pagination">
-      <ul>
-        <li :class="{ disabled: currentPage === 1 }">
-          <a @click="prevPage">Previous</a>
-        </li>
-        <li v-for="page in totalPages" :key="page" :class="{ active: currentPage === page }">
-          <a @click="changePage(page)">{{ page }}</a>
-        </li>
-        <li :class="{ disabled: currentPage === totalPages }">
-          <a @click="nextPage">Next</a>
-        </li>
-      </ul>
-    </nav>
+    <div v-if="items" class="pagination row-center">
+      <button class="btn-item cursor" @click="previousPage" :disabled="currentPage === 1">Previous</button>
+      <h3 class="total-page">{{ currentPage }} / {{ totalPages }}</h3>
+      <button class="btn-item cursor" @click="nextPage" :disabled="currentPage === totalPages">Next</button>
+    </div>
 
   </div>
-
+  <Loading :is-loading="loading"/>
+  <Footer/>
 </template>
 
 <script>
 import Header from "@/components/header/Header.vue";
 import Alert from "@/components/alert/Alert.vue";
+import Loading from "@/components/loading/Loading.vue";
 import axios from 'axios'
 
 
 export default {
-  components: {Header, Alert},
+  components: {Header, Alert,Loading},
   data() {
     return {
       showDialogAddItem: false,
-      showDialogEditItem: false,
       showDialogDeleteItem: false,
-      todoName: '',
+      todoName: ' ',
       isToggled: false,
-      todoNameEdit:'',
-      isToggledEdit:false,
-      idEdit:'',
       text: '',
       show: false,
       color: '',
       search: '',
-      currentPage: 1,
-      itemsPerPage: 10, // Number of items to display per page
-      searchText: '', // Search text input value
+      searchQuery: '',
       data: [],
-
-      items: [
-        {
-          _id: "64ca8cce3233eb7588f6fd67",
-          todoName: "salam man hassan yousefi taeme az tehran motavaled 1375 bara bara ba man amadeam vay vay man amadeam vay vay ",
-          createdAt: "2023-08-02T17:05:16.389Z",
-          isComplet: true
-        }, {
-          _id: "64ca8cce3233eb7588f6fd67",
-          todoName: "Bbbb",
-          createdAt: "2023-08-02T17:05:16.389Z",
-          isComplet: true
-        }, {
-          _id: "64ca8cce3233eb7588f6fd67",
-          todoName: "Bbbb",
-          createdAt: "2023-08-02T17:05:16.389Z",
-          isComplet: true
-        }, {
-          _id: "64ca8cce3233eb7588f6fd67",
-          todoName: "Bbbb",
-          createdAt: "2023-08-02T17:05:16.389Z",
-          isComplet: true
-        }, {
-          _id: "64ca8cce3233eb7588f6fd67",
-          todoName: "Bbbb",
-          createdAt: "2023-08-02T17:05:16.389Z",
-          isComplet: false
-        }, {
-          _id: "64ca8cce3233eb7588f6fd67",
-          todoName: "Bbbb",
-          createdAt: "2023-08-02T17:05:16.389Z",
-          isComplet: false
-        }, {
-          _id: "64ca8cce3233eb7588f6fd67",
-          todoName: "Bbbb",
-          createdAt: "2023-08-02T17:05:16.389Z",
-          isComplet: true
-        }, {
-          _id: "64ca8cce3233eb7588f6fd67",
-          todoName: "Bbbb",
-          createdAt: "2023-08-02T17:05:16.389Z",
-          isComplet: true
-        }, {
-          _id: "64ca8cce3233eb7588f6fd67",
-          todoName: "Bbbb",
-          createdAt: "2023-08-02T17:05:16.389Z",
-          isComplet: true
-        }, {
-          _id: "64ca8cce3233eb7588f6fd67",
-          todoName: "Bbbb",
-          createdAt: "2023-08-02T17:05:16.389Z",
-          isComplet: true
-        }, {
-          _id: "64ca8cce3233eb7588f6fd67",
-          todoName: "Bbbb",
-          createdAt: "2023-08-02T17:05:16.389Z",
-          isComplet: true
-        }, {
-          _id: "64ca8cce3233eb7588f6fd67",
-          todoName: "Bbbb",
-          createdAt: "2023-08-02T17:05:16.389Z",
-          isComplet: true
-        }, {
-          _id: "64ca8cce3233eb7588f6fd67",
-          todoName: "Bbbb",
-          createdAt: "2023-08-02T17:05:16.389Z",
-          isComplet: true
-        }, {
-          _id: "64ca8cce3233eb7588f6fd67",
-          todoName: "jkkkkkkkkkkkkkkkkkkkknv'dsj'''''''''''''''''''''''dvnnnnnnnnnnnnnnnnnnnnnnnnnnnj'sssssssssssssssssvnnnnnnnnnnnnnnnnnnnnnnnnnnn",
-          createdAt: "2023-08-02T17:05:16.389Z",
-          isComplet: true
-        }, {
-          _id: "64ca8cce3233eb7588f6fd67",
-          todoName: "Bbbb",
-          createdAt: "2023-08-02T17:05:16.389Z",
-          isComplet: true
-        },
-      ],
-
+      items: [],
       loading: false,
+      itemsPerPage: 10,
+      currentPage: 1,
+
     }
   },
+  //==================================================================================================================
   computed: {
-    filteredData() {
-      if (this.searchText) {
-        const searchRegex = new RegExp(this.searchText, 'i');
-        return this.data.filter((item) =>
-            Object.values(item).some(value => value.toString().match(searchRegex))
-        );
+    filteredItems() {
+      let filteredItems = this.items;
+      if (this.searchQuery !== "") {
+        filteredItems = filteredItems.filter(item => item._id.toLowerCase().includes(this.searchQuery.toLowerCase()));
       }
-      return this.data;
-    },
-    paginatedData() {
-      const startIndex = (this.currentPage - 1) * this.itemsPerPage;
-      const endIndex = startIndex + this.itemsPerPage;
-      return this.filteredData.slice(startIndex, endIndex);
+      return filteredItems;
     },
     totalPages() {
-      return Math.ceil(this.filteredData.length / this.itemsPerPage);
+      return Math.ceil(this.filteredItems.length / this.itemsPerPage);
+    },
+    paginatedItems() {
+      const startIndex = (this.currentPage - 1) * this.itemsPerPage;
+      return this.filteredItems.slice(startIndex, startIndex + this.itemsPerPage);
     },
   },
+  //====================================================================================================================
   methods: {
-    //==================================================================================================================
     async getTodo() {
       this.loading = true
       await axios.get('https://calm-plum-jaguar-tutu.cyclic.app/todos').then((res) => {
         if (res.status === 200) {
-          // this.items=res.data.data ;
+          this.items = res.data.data;
           console.log(this.items)
         }
       }).catch((err) => {
+        this.show = true
+        this.text = 'Error'
+        this.color = 'background-color: red'
         console.log(err)
       });
       this.loading = false
@@ -281,24 +168,30 @@ export default {
       this.showDialogDeleteItem = false
       await axios.delete('https://calm-plum-jaguar-tutu.cyclic.app/todos/' + id).then((res) => {
         if (res.status === 200) {
+          this.getTodo()
           this.show = true
           this.text = 'Success Deleted Item'
           this.color = 'background-color: red'
         }
       }).catch((err) => {
+        this.show = true
+        this.text = 'Error'
+        this.color = 'background-color: red'
         console.log(err)
       });
       setTimeout(() => {
         this.show = false
       }, 2000)
     },
+    //==================================================================================================================
     async addItem() {
       this.showDialogAddItem = false
-      await axios.post('https://calm-plum-jaguar-tutu.cyclic.app/todos/',{
-        todoName:this.todoName,
-        isComplete:this.isToggled
+      await axios.post('https://calm-plum-jaguar-tutu.cyclic.app/todos', {
+        todoName: this.todoName,
+        isComplete: this.isToggled
       }).then((res) => {
         if (res.status === 200) {
+          this.getTodo()
           this.show = true
           this.text = 'Success Add Item'
           this.color = 'background-color: #87d872'
@@ -313,22 +206,15 @@ export default {
         this.show = false
       }, 2000)
     },
-    getDataEdit(value){
-
-      this.showDialogEditItem=true
-      this.todoNameEdit=value.todoName
-      this.idEdit=value._id
-      this.isToggledEdit=value.isComplet
-    },
-    async editItem() {
-      this.showDialogEditItem = false
-      await axios.put('https://calm-plum-jaguar-tutu.cyclic.app/todos/'+this.idEdit,{
-        todoName:this.todoNameEdit,
-        isComplete:this.isToggledEdit
+    //==================================================================================================================
+    async editItem(value) {
+      await axios.put('https://calm-plum-jaguar-tutu.cyclic.app/todos/' + value._id, {
+        isComplete: value.isComplete = !value.isComplete
       }).then((res) => {
         if (res.status === 200) {
+          this.getTodo()
           this.show = true
-          this.text = 'Success Add Item'
+          this.text = 'Success'
           this.color = 'background-color: #87d872'
         }
       }).catch((err) => {
@@ -347,15 +233,13 @@ export default {
     },
     //==================================================================================================================
     changeTitle(value) {
-      if (value === true) {
-        return "Done";
-      } else {
-        return "Not Dane"
-      }
+      return value === true ? "Done" : "Not Done";
     },
+    //==================================================================================================================
     toggleTitle() {
       return this.isToggled ? 'Done' : 'Not Done';
     },
+    //==================================================================================================================
     toggle() {
       this.isToggled = !this.isToggled;
     },
@@ -368,17 +252,12 @@ export default {
       }
     },
     //==================================================================================================================
-    resetPage() {
-      this.currentPage = 1;
-    },
-    changePage(page) {
-      this.currentPage = page;
-    },
-    prevPage() {
+    previousPage() {
       if (this.currentPage > 1) {
         this.currentPage--;
       }
     },
+    //==================================================================================================================
     nextPage() {
       if (this.currentPage < this.totalPages) {
         this.currentPage++;
@@ -435,18 +314,21 @@ export default {
 //  visibility: visible;
 //}
 
+.pagination {
+  margin-top: 40px;
+}
 
 .dialog-item {
-  background-color: #ccfaf0;
+  background-color: #f6feff;
   padding: 10px;
   border-radius: 8px;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
 }
 
 
 .btn-item {
-  width: 120px;
-  height: 40px;
+  width: 100px;
+  height: 43px;
   margin-top: -30px;
   margin-right: 30px;
   background-color: #FFC23D;
@@ -486,46 +368,12 @@ export default {
   font-weight: bold;
 }
 
-.pagination {
-  display: flex;
-  justify-content: center;
-  margin-top: 20px;
-}
-
-.pagination ul {
-  list-style-type: none;
-  padding: 0;
-  margin: 0;
-}
-
-.pagination li {
-  display: inline-block;
-  margin-right: 5px;
-}
-
-.pagination a {
-  display: block;
-  padding: 8px 12px;
-  text-decoration: none;
-  color: #333;
-  background-color: #f5f5f5;
-  border: 1px solid #ddd;
-}
-
-.pagination a:hover {
-  background-color: #ddd;
-}
-
-.pagination .disabled {
-  pointer-events: none;
-  opacity: 0.5;
-}
-
-
 .toggle-button {
   position: relative;
   width: 55px;
   height: 26px;
+  //margin-bottom: -50x;
+  margin-top: -30px;
   border-radius: 15px;
   border: none;
   outline: none;
@@ -554,5 +402,10 @@ export default {
   background-color: #F9B319;
 }
 
+.total-page {
+  margin-top: -28px;
+  margin-left: -30px;
+  padding: 10px
+}
 
 </style>

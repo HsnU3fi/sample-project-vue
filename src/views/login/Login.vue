@@ -24,6 +24,8 @@
 </template>
 
 <script>
+// import {ADMIN} from "../../globalVaribles";
+
 export default {
   data() {
     return {
@@ -39,7 +41,11 @@ export default {
         "password": this.password,
         "role": this.username[0].toUpperCase() + this.username.slice(1) === "Admin" && this.password === "@dmin" ? "admin" : "user"
       };
+     // console.log('ADMIN')
+     // console.log(ADMIN)
+
       localStorage.setItem("userData", JSON.stringify(objUserData));
+      // window.location.href = "/"
     },
   },
 };
@@ -124,6 +130,7 @@ form input {
   display: block;
   width: 100%;
   padding: 10px;
+  height: 45px;
   margin-bottom: 10px;
   border: 1px solid #ccc;
   border-radius: 4px;
@@ -131,11 +138,12 @@ form input {
 
 form button {
   width: 100%;
+  height: 45px;
   padding: 10px;
   margin-top: 50px;
   color: white;
   border: none;
-  background-color:#F9B319 ;
+  background-color: #F9B319;
   border-radius: 4px;
   cursor: pointer;
 }

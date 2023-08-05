@@ -70,32 +70,6 @@ export default {
 </script>
 
 <style lang="scss">
-.dialog-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  z-index: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.dialog {
-  width: 350px;
-  height: 160px;
-  background-color: #f6feff;
-  padding: 20px;
-  border-radius: 8px;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
-}
-
-.dialog h2 {
-  margin-top: 0;
-  margin-bottom: 30px;
-
-}
 
 
 .dropdown {

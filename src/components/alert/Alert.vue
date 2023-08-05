@@ -20,11 +20,13 @@ export default {
 .ctrl {
   width: 100%;
   position: relative;
+  z-index: 1;
 }
 
 .notification {
   display: block;
   font-size: 14px;
+
   width: 250px;
   padding: 5px ;
   position: absolute;

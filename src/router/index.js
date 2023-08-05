@@ -13,10 +13,20 @@ const router = createRouter({
     {
       path: '/',
       name: 'home',
-      component: HomeView
+      component: HomeView,
+      beforeEnter(to, from, next) {
+        const userData = localStorage.getItem("userData");
+        if (!userData) {
+          next("/login");
+        } else {
+          next();
+        }
+      }
     },
 
-  ]
-})
+  ],
+
+
+  })
 
 export default router
