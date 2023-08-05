@@ -7,10 +7,10 @@
       <h2 class="font">Login</h2>
       <form @submit.prevent="login">
         <label>
-          <input type="text" placeholder="Username" v-model="username" required>
+          <input maxlength="20" minlength="5" type="text" placeholder="Username" v-model="username" required>
         </label>
         <label>
-          <input type="password" placeholder="Password" v-model="password" required>
+          <input maxlength="20" minlength="5"  type="password" placeholder="Password" v-model="password" required>
         </label>
         <button type="submit">
           <span>Login</span>
@@ -24,7 +24,7 @@
 </template>
 
 <script>
-// import {ADMIN} from "../../globalVaribles";
+
 
 export default {
   data() {
@@ -39,13 +39,10 @@ export default {
       let objUserData = {
         "username": this.username[0].toUpperCase() + this.username.slice(1),
         "password": this.password,
-        "role": this.username[0].toUpperCase() + this.username.slice(1) === "Admin" && this.password === "@dmin" ? "admin" : "user"
+        "role": this.username[0].toUpperCase() + this.username.slice(1) === "Admin" && this.password === "@dmin" ? "ADMIN" : "USER"
       };
-     // console.log('ADMIN')
-     // console.log(ADMIN)
-
       localStorage.setItem("userData", JSON.stringify(objUserData));
-      // window.location.href = "/"
+      window.location.href = "/"
     },
   },
 };
@@ -141,8 +138,9 @@ form button {
   height: 45px;
   padding: 10px;
   margin-top: 50px;
-  color: white;
   border: none;
+  color: black;
+  font-size: 15px;
   background-color: #F9B319;
   border-radius: 4px;
   cursor: pointer;

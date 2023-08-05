@@ -1,104 +1,106 @@
 <template>
-  <Header/>
-  <Alert :show="show" :color="color" :text="text"/>
+    <Header />
+    <Alert :show="show" :color="color" :text="text"/>
 
-  <div class="table-container">
-    <h2 v-if="!items" class="row-center font-word space-top">
-      Please add a new item
-    </h2>
+    <div class="table-container">
+      <h2 v-if="!items" class="row-center font-word space-top">
+        Please add a new item
+      </h2>
 
-    <label v-if="items">
-      <input type="text" class="search-bar" v-model="searchQuery" placeholder="Search By Id">
-    </label>
-
-
-    <button @click="showDialogAddItem=true" class="right btn-add-item cursor">
-      <h3>Add Item</h3>
-    </button>
-
-    <table v-if="items" class="table">
-      <thead>
-      <tr>
-        <th>ID</th>
-        <th>TODO</th>
-        <th>CREATED AT</th>
-        <th>IS COMPLETE</th>
-        <th>DELETE ITEM</th>
-      </tr>
-      </thead>
-      <tbody>
-      <tr v-for="(item,i) in  paginatedItems" :key="i">
-        <td>{{ item._id }}</td>
-        <td>
-          <div class="tooltip">{{ item.todoName.slice(0, 30) + ' ...' }}
-            <!--            <span class="tooltiptext">{{ item.todoName }}</span>-->
-          </div>
-        </td>
-        <td>{{ formatDate(item.createdAt) }}</td>
-
-        <td>
-          <button @click="editItem(item)" class="cursor" :style="getColor(item.isComplete)">
-            <h3 class="row-center">{{ changeTitle(item.isComplete) }}</h3>
-          </button>
-        </td>
+      <label v-if="items">
+        <input type="text" class="search-bar" v-model="searchQuery" placeholder="Search By Id">
+      </label>
 
 
-        <td>
-          <button @click="showDialogDeleteItem=true" class="btn-delete cursor">
-            <h3>Delete</h3>
-          </button>
-        </td>
+      <button :disabled="hasPermission" @click="showDialogAddItem=true;" class="right btn-add-item cursor">
+        <h3>Add Item</h3>
+      </button>
 
-        <div  v-if="showDialogDeleteItem" class="dialog-overlay">
-          <div class="dialog-item">
+      <table v-if="items" class="table">
+        <thead>
+        <tr>
+          <th>ID</th>
+          <th>TODO</th>
+          <th>CREATED AT</th>
+          <th>IS COMPLETE</th>
+          <th>DELETE ITEM</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr v-for="(item,i) in  paginatedItems" :key="i">
+          <td>{{ item._id }}</td>
+          <td>
+            <div>
+              <h3 class="tooltip"   :title="item.todoName">{{ item.todoName.slice(0, 30)+" ..."  }}</h3>
+            </div>
+         </td>
+          <td>{{ formatDate(item.createdAt) }}</td>
 
-            <h2 class="font-word">
-              Are you sure you want to delete item ?
-            </h2>
-            <div class="row-center">
-              <button class="space-item btn-dialog" @click="showDialogDeleteItem = false;"><h3 class="font-word">
-                Cancel</h3>
-              </button>
-              <div class="space-item"/>
-              <button class="space-item btn-dialog" @click="deleteItem(item._id)"><h3 class="font-word">Yes</h3>
-              </button>
+          <td>
+            <button :disabled="hasPermission" @click="editItem(item)" class="cursor"
+                    :style="getColor(item.isComplete)">
+              <h3 class="row-center">{{ changeTitle(item.isComplete) }}</h3>
+            </button>
+          </td>
+
+
+          <td>
+            <button :disabled="hasPermission" @click="showDialogDeleteItem=true" class="btn-delete cursor">
+              <h3>Delete</h3>
+            </button>
+          </td>
+
+          <div  v-if="showDialogDeleteItem" class="dialog-overlay" style="background-color: rgba(0, 0, 0, 0.1);">
+            <div class="dialog" >
+
+              <h2 class="font-word">
+                Are you sure you want to delete item ?
+              </h2>
+              <div class="row-center">
+                <button class="space-item btn" @click="showDialogDeleteItem = false;"><h3 class="font-word">
+                  Cancel</h3>
+                </button>
+                <div class="space-item"/>
+                <button class="space-item btn" @click="deleteItem(item._id)"><h3 class="font-word">Yes</h3>
+                </button>
+              </div>
             </div>
           </div>
-        </div>
-      </tr>
-      </tbody>
-    </table>
+        </tr>
+        </tbody>
+      </table>
 
-    <div  v-if="showDialogAddItem" class="dialog-overlay">
-      <div class="dialog-item">
-        <h3 class="font-word">Todo:</h3>
-        <textarea  required class="textarea-size" v-model="todoName"/>
-        <h3 class="font-word">
-          {{ toggleTitle() }}
-        </h3>
-        <div>
-          <button class="toggle-button" :class="{ active: isToggled }" @click="toggle">
-            <div class="toggle-circle" :class="{ active: isToggled }"/>
-          </button>
-        </div>
-        <div class="row-center">
-          <button class="space-item btn-dialog" @click="showDialogAddItem = false;"><h3 class="font-word">Cancel</h3>
-          </button>
-          <div class="space-item"/>
-          <button @click="addItem();" class="space-item btn-dialog"><h3 class="font-word">Save</h3></button>
+      <div v-if="showDialogAddItem" class="dialog-overlay">
+        <div class="dialog-item" >
+          <h3 class="font-word">Todo:</h3>
+          <textarea required class="textarea-size"  v-model="todoName"/>
+          <h3 class="font-word">
+            {{ toggleTitle() }}
+          </h3>
+          <div>
+            <button class="toggle-button" :class="{ active: isToggled }" @click="toggle">
+              <div class="toggle-circle" :class="{ active: isToggled }"/>
+            </button>
+          </div>
+          <div class="row-center">
+            <button class="space-item btn" @click="showDialogAddItem=false"><h3 class="font-word">Cancel</h3>
+            </button>
+            <div class="space-item"/>
+            <button @click="addItem();" class="space-item btn"><h3 class="font-word">Save</h3></button>
+          </div>
         </div>
       </div>
+
+      <div v-if="items" class="pagination row-center">
+        <button class="btn-item cursor" @click="previousPage" :disabled="currentPage === 1">Previous</button>
+        <h3 class="total-page">{{ currentPage }} / {{ totalPages }}</h3>
+        <button class="btn-item cursor" @click="nextPage" :disabled="currentPage === totalPages">Next</button>
+      </div>
+
     </div>
 
-    <div v-if="items" class="pagination row-center">
-      <button class="btn-item cursor" @click="previousPage" :disabled="currentPage === 1">Previous</button>
-      <h3 class="total-page">{{ currentPage }} / {{ totalPages }}</h3>
-      <button class="btn-item cursor" @click="nextPage" :disabled="currentPage === totalPages">Next</button>
-    </div>
-
-  </div>
-  <Loading :is-loading="loading"/>
-  <Footer/>
+    <Loading :is-loading="loading"/>
+    <Footer/>
 </template>
 
 <script>
@@ -109,7 +111,7 @@ import axios from 'axios'
 
 
 export default {
-  components: {Header, Alert,Loading},
+  components: {Header, Alert, Loading},
   data() {
     return {
       showDialogAddItem: false,
@@ -145,6 +147,11 @@ export default {
       const startIndex = (this.currentPage - 1) * this.itemsPerPage;
       return this.filteredItems.slice(startIndex, startIndex + this.itemsPerPage);
     },
+    hasPermission() {
+      const userData = JSON.parse(localStorage.getItem('userData'))
+      return userData.role !== "ADMIN";
+    },
+
   },
   //====================================================================================================================
   methods: {
@@ -263,6 +270,7 @@ export default {
         this.currentPage++;
       }
     },
+
   },
   created() {
     this.getTodo()
@@ -290,32 +298,45 @@ export default {
 }
 
 
+
 .tooltip {
   position: relative;
   display: inline-block;
+  cursor: pointer;
 }
 
-.tooltip .tooltiptext {
-  visibility: hidden;
+.tooltip::after {
+  overflow-x: scroll;
+  overflow-y: hidden;
+  margin: 20px;
+  content: attr(title);
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  white-space: nowrap;
   background-color: #F9B319;
   color: #000;
+  padding: 4px;
+  border-radius: 8px;
+  font-size: 14px;
+  opacity: 0;
+  width: 300px;
+  visibility: hidden;
+  transition: opacity 0.3s, visibility 0.3s;
+  height: 100px;
   text-align: center;
-  border-radius: 6px;
-  padding: 10px;
-  /* Position the tooltip */
-  position: absolute;
-  z-index: 1;
-  top: 100%;
-  left: 50%;
-  margin-left: -60px;
+
 }
 
-//.tooltip:hover .tooltiptext {
-//  visibility: visible;
-//}
+.tooltip:hover::after {
+  opacity: 1;
+  visibility: visible;
+}
 
 .pagination {
   margin-top: 40px;
+  margin-bottom: 50px;
 }
 
 .dialog-item {
@@ -372,7 +393,6 @@ export default {
   position: relative;
   width: 55px;
   height: 26px;
-  //margin-bottom: -50x;
   margin-top: -30px;
   border-radius: 15px;
   border: none;

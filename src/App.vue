@@ -1,5 +1,5 @@
 <template>
-  <v-app class="bg">
+  <v-app  class="bg">
     <v-main>
       <router-view/>
     </v-main>
@@ -13,9 +13,5 @@ import Footer from "@/components/footer/Footer.vue";
 export default {
   name: 'App',
   components: { Footer },
-
-  data: () => ({
-    //
-  }),
 }
 </script>
