@@ -8,7 +8,7 @@ const router = createRouter({
     {
       path: '/login',
       name: 'login',
-      component: LoginView
+      component: LoginView,
     },
     {
       path: '/',
@@ -18,8 +18,8 @@ const router = createRouter({
         const userData = localStorage.getItem("userData");
         if (!userData) {
           next("/login");
-        } else {
-          next();
+        }else {
+          next()
         }
       }
     },
