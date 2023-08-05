@@ -324,7 +324,7 @@ export default {
   width: 300px;
   visibility: hidden;
   transition: opacity 0.3s, visibility 0.3s;
-  height: 100px;
+  height: 50px;
   text-align: center;
 
 }
