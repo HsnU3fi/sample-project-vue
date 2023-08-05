@@ -83,7 +83,8 @@ export default {
 }
 
 .icon-exit {
-  border-radius: 80px;margin-top: -10px;margin-left: 10px;margin-right: 15px
+  border-radius: 80px;margin-top: -10px;margin-left: 10px;margin-right: 15px;
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.20);
 }
 
 .header {
