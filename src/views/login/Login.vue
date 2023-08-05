@@ -39,7 +39,7 @@ export default {
       let objUserData = {
         "username": this.username[0].toUpperCase() + this.username.slice(1),
         "password": this.password,
-        "role": this.username[0].toUpperCase() + this.username.slice(1) === "Admin" && this.password === "@dmin" ? "ADMIN" : "USER"
+        "role": this.username[0].toUpperCase() + this.username.slice(1).split(" ").join("") === "Admin" && this.password === "@dmin" ? "ADMIN" : "USER"
       };
       localStorage.setItem("userData", JSON.stringify(objUserData));
       window.location.href = "/"

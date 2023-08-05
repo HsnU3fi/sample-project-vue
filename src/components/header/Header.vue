@@ -9,11 +9,10 @@
       </div>
 
       <div class="container">
-        <h1 style="font-weight: bold;font-size: 15px;margin-top: -10px">{{ username || '---' }}</h1>
-
-        <div style="font-weight: bold;font-size: 15px;margin-left: -8px;margin-top: -5px" class="row-items">
+        <h1 class="font-header" style="margin-top: -10px;">{{ username || '---' }}</h1>
+        <div  style="margin-left: -8px;margin-top: -5px" class="font-header row-items">
           Role :
-          <h4 style="color: #F9B319;font-weight: bold;font-size: 15px;" >
+          <h4 style="color: #F9B319;" class="font-header" >
             {{role }}
           </h4>
         </div>
@@ -70,17 +69,15 @@ export default {
 </script>
 
 <style lang="scss">
+.font-header{
+  font-weight: bold;font-size: 15px;
+
+}
 .container {
   display: flex;
   flex-direction: column;
 }
 
-
-.font-role {
-  font-size: 15px;
-  font-weight: bold;
-  margin-left: 5px;
-}
 
 .icon-exit {
   border-radius: 80px;margin-top: -10px;margin-left: 10px;margin-right: 15px;
