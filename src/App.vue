@@ -1,10 +1,8 @@
-<template>
-  <v-app  class="bg">
-    <v-main>
+<template class="bg">
+  <div>
       <router-view/>
-    </v-main>
     <Footer/>
-  </v-app>
+  </div>
 </template>
 
 <script>

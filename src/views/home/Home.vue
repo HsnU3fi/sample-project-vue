@@ -45,7 +45,7 @@
 
 
           <td>
-            <button :disabled="hasPermission" @click="showDialogDeleteItem=true" class="btn-delete cursor">
+            <button :disabled="hasPermission" @click="showDialogDeleteItem=true;idDelete=item._id" class="btn-delete cursor">
               <h3>Delete</h3>
             </button>
           </td>
@@ -61,7 +61,7 @@
                   Cancel</h3>
                 </button>
                 <div class="space-item"/>
-                <button class="space-item btn" @click="deleteItem(item._id)"><h3 class="font-word">Yes</h3>
+                <button class="space-item btn" @click="deleteItem()"><h3 class="font-word">Yes</h3>
                 </button>
               </div>
             </div>
@@ -123,8 +123,8 @@ export default {
       color: '',
       search: '',
       searchQuery: '',
-      data: [],
       items: [],
+      idDelete:'',
       loading: false,
       itemsPerPage: 10,
       currentPage: 1,
@@ -171,9 +171,9 @@ export default {
       this.loading = false
     },
     //==================================================================================================================
-    async deleteItem(id) {
+    async deleteItem() {
       this.showDialogDeleteItem = false
-      await axios.delete('https://calm-plum-jaguar-tutu.cyclic.app/todos/' + id).then((res) => {
+      await axios.delete('https://calm-plum-jaguar-tutu.cyclic.app/todos/'+ this.idDelete).then((res) => {
         if (res.status === 200) {
           this.getTodo()
           this.show = true
